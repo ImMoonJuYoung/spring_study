@@ -22,8 +22,6 @@ public class OrderServiceImpl implements OrderService {
     * */
 
     private final DiscountPolicy discountPolicy;
-
-//    private final MemberRepository memberRepository = new MemoryMemberRepository();
     private final MemberRepository memberRepository;
 
     @Autowired
