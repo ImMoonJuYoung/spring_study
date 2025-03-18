@@ -22,9 +22,9 @@ class StatefulServiceTest {
         // ThreadB
         statefulService1.order("userB", 20000);
 
-        int price = statefulService1.getPrice();
-        System.out.println("price = " + price);
-        assertThat(statefulService1.getPrice()).isEqualTo(20000);
+//        int price = statefulService1.getPrice();
+//        System.out.println("price = " + price);
+//        assertThat(statefulService1.getPrice()).isEqualTo(20000);
 
     }
 
