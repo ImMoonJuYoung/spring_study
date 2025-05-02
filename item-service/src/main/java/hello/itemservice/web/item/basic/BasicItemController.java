@@ -67,10 +67,16 @@ public class BasicItemController {
         return "basic/item";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV4(Item item) { // 최대한으로 생략 가능. 가독성은 별로임.
         itemRepository.save(item);
         return "basic/item";
+    }
+
+    @PostMapping("/add")
+    public String addItemV5(Item item) { // return을 redirect로 -> PRG Post/Redirect/Get
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId();
     }
 
 
