@@ -20,7 +20,7 @@ public class MessageSourceTest {
     @Test
     void helloMessage() {
         String result = ms.getMessage("hello", null, null);
-        assertThat(result).isEqualTo("hello");
+        assertThat(result).isEqualTo("안녕");
     }
 
     @Test
@@ -47,5 +47,5 @@ public class MessageSourceTest {
         assertThat(ms.getMessage("hello", null, Locale.KOREA)).isEqualTo("hello");
     }
 
-    
+
 }
