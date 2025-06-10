@@ -28,6 +28,7 @@ public class FileStore {
                 storeFileResult.add(storeFile(multipartFile));
             }
         }
+        return storeFileResult;
     }
 
     public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
@@ -48,12 +49,12 @@ public class FileStore {
     private String createStoreFileName(String originalFilename) {
         String ext  = extracted(originalFilename);
         String uuid = UUID.randomUUID().toString();
-        String storeFileName = uuid + "." + ext;
+        return uuid + "." + ext;
     }
 
     private String extracted(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
-        String ext = originalFilename.substring(pos + 1);
+        return originalFilename.substring(pos + 1);
     }
 
 
