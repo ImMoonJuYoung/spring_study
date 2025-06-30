@@ -1,5 +1,6 @@
 package hello.itemservice.domain;
 
+import hello.itemservice.config.JpaConfig;
 import hello.itemservice.config.MyBatisConfig;
 import hello.itemservice.repository.ItemRepository;
 import hello.itemservice.repository.ItemSearchCond;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @SpringBootTest
-@Import(MyBatisConfig.class) // MapperScan 포함된 설정 클래스
+@Import(JpaConfig.class) // MapperScan 포함된 설정 클래스
 class ItemRepositoryTest {
 
     @Autowired
