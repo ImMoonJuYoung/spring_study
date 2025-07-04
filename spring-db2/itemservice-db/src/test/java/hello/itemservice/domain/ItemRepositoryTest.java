@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @Transactional
 @SpringBootTest
-@Import(SpringDataJpaConfig.class) // MapperScan 포함된 설정 클래스
 class ItemRepositoryTest {
 
     @Autowired
