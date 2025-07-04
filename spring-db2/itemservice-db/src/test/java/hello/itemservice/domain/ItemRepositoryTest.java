@@ -2,6 +2,7 @@ package hello.itemservice.domain;
 
 import hello.itemservice.config.JpaConfig;
 import hello.itemservice.config.MyBatisConfig;
+import hello.itemservice.config.SpringDataJpaConfig;
 import hello.itemservice.repository.ItemRepository;
 import hello.itemservice.repository.ItemSearchCond;
 import hello.itemservice.repository.ItemUpdateDto;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @Transactional
 @SpringBootTest
-@Import(JpaConfig.class) // MapperScan 포함된 설정 클래스
+@Import(SpringDataJpaConfig.class) // MapperScan 포함된 설정 클래스
 class ItemRepositoryTest {
 
     @Autowired
