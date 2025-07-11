@@ -1,12 +1,11 @@
 package hello.springtx.propagation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -63,6 +62,24 @@ class MemberServiceTest {
     void singleTx() {
         // given
         String username = "singleTx";
+
+        // when
+        memberService.joinV1(username);
+
+        // then
+        assertTrue(memberRepository.find(username).isPresent());
+        assertTrue(logRepository.find(username).isPresent());
+    }
+
+    /**
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON
+     */
+    @Test
+    void outerTxOn_success() {
+        // given
+        String username = "outerTxOn_success";
 
         // when
         memberService.joinV1(username);
