@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // 상속 전략
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // 상속 전략, 한 테이블에 정보 다 채워놓고 관리
 @DiscriminatorColumn(name = "dtype")
 @Getter @Setter
 public abstract class Item {
