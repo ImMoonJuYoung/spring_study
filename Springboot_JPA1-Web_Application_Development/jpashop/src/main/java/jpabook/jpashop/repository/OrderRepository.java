@@ -1,10 +1,14 @@
 package jpabook.jpashop.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -21,5 +25,42 @@ public class OrderRepository {
         return em.find(Order.class, id);
     }
 
-//    public List<Order> findAll(OrderSearch orderSearch) {}
+    public List<Order> findAll(OrderSearch orderSearch) {
+        // 아래처럼 파라미터가 모두 채워져 있지 않은 경우엔 동적 쿼리를 사용해야 한다.
+//        return em.createQuery("select o from Order o join o.member m where o.status = :status and m.name like :name", Order.class)
+//                .setParameter("status", orderSearch.getOrderStatus())
+//                .setParameter("name", orderSearch.getMemberName())
+//                .setMaxResults(1000) // 최대 1000건
+//                .getResultList();
+
+        return em.createQuery("select o from Order o join o.member m", Order.class)
+                .setMaxResults(1000) // 최대 1000건
+                .getResultList();
+    }
+
+
+    // JPA Criteria (비추천, 결국엔 QueryDSL 사용)
+    public List<Order> findAllByCriteria(OrderSearch orderSearch) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
+        Root<Order> o = cq.from(Order.class);
+        Join<Object, Object> m = o.join("member", JoinType.INNER);
+        ArrayList<Predicate> criteria = new ArrayList<>();
+        // 주문 상태 검색
+        if (orderSearch.getOrderStatus() != null) {
+            Predicate status = cb.equal(o.get("status"), orderSearch.getOrderStatus());
+            criteria.add(status);
+        }
+        // 회원 이름 검색
+        if (StringUtils.hasText(orderSearch.getMemberName())) {
+            Predicate name =
+                    cb.like(m.<String>get("name"), "%" +
+                            orderSearch.getMemberName() + "%");
+            criteria.add(name);
+        }
+        cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
+        TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대1000건
+        return query.getResultList();
+
+    }
 }
