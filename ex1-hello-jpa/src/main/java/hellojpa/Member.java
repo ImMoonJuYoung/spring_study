@@ -9,29 +9,19 @@ import java.util.Date;
 @Entity
 public class Member {
 
-    @Id
+    @Id @GeneratedValue
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "USERNAME")
     private String username;
     private Integer age;
 
-    @Enumerated(EnumType.STRING)
-    private RoleType roleType;
+//    @Column(name = "TEAM_ID")
+//    private Long teamId;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastModifiedDate;
-    private LocalDate testLocalDate;
-    private LocalDateTime testLocalDateTime;
-
-    @Lob
-    private String description;
-
-    public Member() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
 
     public Long getId() {
         return id;
@@ -57,35 +47,17 @@ public class Member {
         this.age = age;
     }
 
-    public RoleType getRoleType() {
-        return roleType;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setRoleType(RoleType roleType) {
-        this.roleType = roleType;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
-    }
 
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Date lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void changeTeam(Team team) {
+        this.team = team;
+        team.getMembers().add(this);
     }
 }

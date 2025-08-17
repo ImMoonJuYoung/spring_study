@@ -2,6 +2,8 @@ package hellojpa;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 public class JpaMain {
 
     public static void main(String[] args) {
@@ -13,16 +15,28 @@ public class JpaMain {
         tx.begin();
 
         try {
-            // 비영속
-            Member member = new Member();
-            member.setId(100L);
-            member.setUsername("A");
-            member.setRoleType(RoleType.USER);
+            // 저장
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
 
-            // 영속 (바로 DB에 쿼리 날라가지 않음)
-//            em.persist(member); // 변경감지(Dirty Checking) 기능 덕분에 필요 없음
-//            em.detach(member); // 엔티티를 영속성 컨텍스트에서 분, 준영속 상태
-//            em.remove(member); // 엔티티 삭세
+            Member member = new Member();
+            member.setUsername("member1");
+            member.changeTeam(team);
+            em.persist(member);
+
+//            team.addMember(member);
+
+            em.flush();
+            em.clear();
+
+            Team findTeam = em.find(Team.class, team.getId()); // 1차 캐시
+            List<Member> members = findTeam.getMembers();
+
+            for (Member m : members) {
+                System.out.println("m = " + m.getUsername());
+            }
+
 
             tx.commit();
         } catch (Exception e) {
