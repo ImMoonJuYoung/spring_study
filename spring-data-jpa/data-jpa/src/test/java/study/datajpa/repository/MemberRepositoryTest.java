@@ -1,5 +1,7 @@
 package study.datajpa.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,7 @@ class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext EntityManager em;
 
 
     @Test
@@ -197,6 +200,23 @@ class MemberRepositoryTest {
         assertThat(page.getNumber()).isEqualTo(0);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 12));
+        memberRepository.save(new Member("member3", 24));
+        memberRepository.save(new Member("member4", 20));
+        memberRepository.save(new Member("member5", 21));
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);
+//        em.clear();
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
     }
 
 
