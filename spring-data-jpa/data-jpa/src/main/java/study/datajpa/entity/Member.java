@@ -8,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"})
 @NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
-public class Member extends BaseEntity {
+//public class Member extends BaseEntity {
+public class Member  {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
