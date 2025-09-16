@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter @Setter
 public class Hello {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 }
