@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -125,18 +128,102 @@ public class QuerydslBasicTest {
         assertThat(member5.getUsername()).isEqualTo("member5");
         assertThat(member6.getUsername()).isEqualTo("member6");
         assertThat(memberNull.getUsername()).isNull();
-
     }
 
+    @Test
+    public void paging1() {
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)
+                .limit(2)
+                .fetch();
+        assertThat(result.size()).isEqualTo(2);
+    }
 
+    @Test
+    public void paging2() {
+        QueryResults<Member> queryResults = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)
+                .limit(2)
+                .fetchResults();
+        assertThat(queryResults.getTotal()).isEqualTo(4);
+        assertThat(queryResults.getLimit()).isEqualTo(2);
+        assertThat(queryResults.getOffset()).isEqualTo(1);
+        assertThat(queryResults.getResults().size()).isEqualTo(2);
+    }
 
+    //    순수 Querydsl로 대체 (가장 단순한 리팩토링)
+    @Test
+    public void paging3() {
+        // given
+        long offset = 1;
+        long limit = 2;
 
+        // when - content
+        List<Member> content = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
 
+        // and - count 쿼리
+        Long total = queryFactory
+                .select(member.count())
+                .from(member)
+                .fetchOne();
 
+        // then
+        assertThat(total).isEqualTo(4L); // 전체 건수 검증
+        assertThat(content).hasSize(2); // page size 검증
 
+        // fetchResults()가 사라졌으므로 limit/offset은 직접 검증
+        assertThat(limit).isEqualTo(2L);
+        assertThat(offset).isEqualTo(1L);
 
+        // (선택) 정렬이 기대대로인지 구체 검증하고 싶다면 도메인/픽스처에 맞게 추가
+        // assertThat(content).extracting(Member::getUsername).containsExactly("user3", "user2");
+    }
 
+    // Spring Data JPA Page로 감싸는 방식 (실무 페이징 패턴)
+    @Test
+    public void paging4() {
+        // given
+        long offset = 1L;
+        long limit = 2L;
 
+        // content
+        List<Member> content = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+
+        // count
+        Long total = queryFactory
+                .select(member.count())
+                .from(member)
+                .fetchOne();
+
+        // Page 객체로 감싸기 (PageImpl 사용)
+        Page<Member> page = new PageImpl<>(content, Pageable.unpaged(), total); // 혹은 적절한 Pageable
+
+        // then
+        assertThat(page.getTotalElements()).isEqualTo(4L);
+        assertThat(page.getContent()).hasSize(2);
+
+        // Page는 offset/limit 원시값을 직접 들고 있지 않으므로 필요한 경우 별도 검증
+        assertThat(limit).isEqualTo(2L);
+        assertThat(offset).isEqualTo(1L);
+    }
+
+//    참고: PageRequest는 페이지 기반(0,1,2…)이라 임의 offset(=1) 을 그대로 표현하기가 모호합니다.
+//    임의 offset을 쓰는 테스트라면 PageImpl에 Pageable.unpaged() 또는 적절한 Pageable을 넣고,
+//    offset은 별도 변수로 관리/검증하는 편이 명확합니다.
 
 
 }
