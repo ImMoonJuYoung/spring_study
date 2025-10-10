@@ -5,10 +5,12 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
+import org.hibernate.annotations.processing.SQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.log.LogDelegateFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -298,6 +300,41 @@ public class QuerydslBasicTest {
                 .containsExactly("teamA", "teamB");
     }
 
+     // 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
+     // JPQL: SELECT m, t FROM Member m LEFT JOIN m.team t on t.name = 'teamA'
+     // SQL: SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.TEAM_ID=t.id and t.name='teamA'
+    @Test
+    public void join_on_filtering() throws Exception {
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA")) // on은 조인 전에 필터링하고, 조인되지 않은 행도 Null로 표시
+//                .where(team.name.eq("teamA"))
+                .fetch();
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+    }
 
+    // 연관관계 없는 엔티티 외부 조인
+    // 회원의 이름과 팀의 이름이 같은 대상 외부 조인
+    // JPQL: SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name
+    // SQL: SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.username = t.name
+    @Test
+    public void join_on_no_relation() throws Exception {
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team).on(member.username.eq(team.name))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+    }
 
 }
