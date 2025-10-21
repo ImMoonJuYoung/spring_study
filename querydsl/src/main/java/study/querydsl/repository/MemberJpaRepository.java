@@ -93,15 +93,9 @@ public class MemberJpaRepository {
                 .fetch();
     }
 
-    public List<MemberTeamDto> search(MemberSearchCondition condition) {
+    public List<Member> searchMember(MemberSearchCondition condition) {
         return queryFactory
-                .select(new QMemberTeamDto(
-                        member.id.as("memberId"),
-                        member.username,
-                        member.age,
-                        team.id.as("teamId"),
-                        team.name.as("teamName")))
-                .from(member)
+                .selectFrom(member)
                 .leftJoin(member.team, team)
                 .where(
                         usernameEq(condition.getUsername()),
@@ -111,9 +105,15 @@ public class MemberJpaRepository {
                 .fetch();
     }
 
-    public List<Member> searchMember(MemberSearchCondition condition) {
+    public List<MemberTeamDto> search(MemberSearchCondition condition) {
         return queryFactory
-                .selectFrom(member)
+                .select(new QMemberTeamDto(
+                        member.id.as("memberId"),
+                        member.username,
+                        member.age,
+                        team.id.as("teamId"),
+                        team.name.as("teamName")))
+                .from(member)
                 .leftJoin(member.team, team)
                 .where(
                         usernameEq(condition.getUsername()),
