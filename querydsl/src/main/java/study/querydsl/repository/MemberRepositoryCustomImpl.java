@@ -51,11 +51,11 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     public Page<MemberTeamDto> searchPageSimple(MemberSearchCondition condition, Pageable pageable) {
         QueryResults<MemberTeamDto> results = queryFactory
                 .select(new QMemberTeamDto(
-                        member.id.as("memberId"),
+                        member.id,
                         member.username,
                         member.age,
-                        team.id.as("teamId"),
-                        team.name.as("teamName")))
+                        team.id,
+                        team.name))
                 .from(member)
                 .leftJoin(member.team, team)
                 .where(
@@ -64,6 +64,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         ageGoe(condition.getAgeGoe()),
                         ageLoe(condition.getAgeLoe()))
                 .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetchResults();
         List<MemberTeamDto> content = results.getResults();
         long total = results.getTotal();
@@ -75,11 +76,11 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
         List<MemberTeamDto> content = queryFactory
                 .select(new QMemberTeamDto(
-                        member.id.as("memberId"),
+                        member.id,
                         member.username,
                         member.age,
-                        team.id.as("teamId"),
-                        team.name.as("teamName")))
+                        team.id,
+                        team.name))
                 .from(member)
                 .leftJoin(member.team, team)
                 .where(
@@ -88,6 +89,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         ageGoe(condition.getAgeGoe()),
                         ageLoe(condition.getAgeLoe()))
                 .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Member> countQuery = queryFactory
